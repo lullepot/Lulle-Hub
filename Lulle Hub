@@ -1,0 +1,165 @@
+-- Lulle Hub UI
+local player = game.Players.LocalPlayer
+
+-- Criar GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "LulleHub"
+gui.Parent = game.CoreGui
+
+-- Frame principal
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 500, 0, 300)
+main.Position = UDim2.new(0.5, -250, 0.5, -150)
+main.BackgroundColor3 = Color3.fromRGB(13, 13, 13)
+main.Parent = gui
+
+-- Borda roxa
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(106, 13, 173)
+stroke.Thickness = 2
+stroke.Parent = main
+
+-- Título
+local title = Instance.new("TextLabel")
+title.Text = "Lulle Hub"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(200, 100, 255)
+title.Parent = main
+
+-- Botão fechar
+local close = Instance.new("TextButton")
+close.Text = "X"
+close.Size = UDim2.new(0, 40, 0, 40)
+close.Position = UDim2.new(1, -40, 0, 0)
+close.BackgroundColor3 = Color3.fromRGB(106, 13, 173)
+close.Parent = main
+
+close.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Menu lateral
+local menu = Instance.new("Frame")
+menu.Size = UDim2.new(0, 120, 1, -40)
+menu.Position = UDim2.new(0, 0, 0, 40)
+menu.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+menu.Parent = main
+
+-- Área de conteúdo
+local content = Instance.new("Frame")
+content.Size = UDim2.new(1, -120, 1, -40)
+content.Position = UDim2.new(0, 120, 0, 40)
+content.BackgroundTransparency = 1
+content.Parent = main
+
+-- Função criar botão
+local function createButton(name, posY)
+    local btn = Instance.new("TextButton")
+    btn.Text = name
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Parent = menu
+    
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(106, 13, 173)
+    end)
+    
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    end)
+    
+    return btn
+end
+
+-- Criar abas
+local homeBtn = createButton("Home", 0)
+local farmBtn = createButton("Farm", 40)
+local tpBtn = createButton("Teleport", 80)
+local setBtn = createButton("Settings", 120)
+
+-- Função limpar tela
+local function clear()
+    for _, v in pairs(content:GetChildren()) do
+        v:Destroy()
+    end
+end
+
+-- Home
+homeBtn.MouseButton1Click:Connect(function()
+    clear()
+    
+    local txt = Instance.new("TextLabel")
+    txt.Text = "Bem-vindo ao Lulle Hub!"
+    txt.Size = UDim2.new(1, 0, 0, 50)
+    txt.BackgroundTransparency = 1
+    txt.TextColor3 = Color3.fromRGB(255,255,255)
+    txt.Parent = content
+end)
+
+-- Farm (SAFE base)
+farmBtn.MouseButton1Click:Connect(function()
+    clear()
+    
+    local start = Instance.new("TextButton")
+    start.Text = "Start Action"
+    start.Size = UDim2.new(0,150,0,40)
+    start.Position = UDim2.new(0,20,0,20)
+    start.Parent = content
+    
+    local stop = Instance.new("TextButton")
+    stop.Text = "Stop Action"
+    stop.Size = UDim2.new(0,150,0,40)
+    stop.Position = UDim2.new(0,20,0,70)
+    stop.Parent = content
+    
+    local running = false
+    
+    start.MouseButton1Click:Connect(function()
+        running = true
+        print("Sistema iniciado (base)")
+        
+        while running do
+            task.wait(1)
+            print("Executando ação...")
+        end
+    end)
+    
+    stop.MouseButton1Click:Connect(function()
+        running = false
+        print("Parado")
+    end)
+end)
+
+-- Teleport (visual)
+tpBtn.MouseButton1Click:Connect(function()
+    clear()
+    
+    local places = {"Grassland", "Jungle", "Volcano", "Ocean"}
+    
+    for i, name in pairs(places) do
+        local btn = Instance.new("TextButton")
+        btn.Text = name
+        btn.Size = UDim2.new(0,150,0,40)
+        btn.Position = UDim2.new(0,20,0,(i-1)*50)
+        btn.Parent = content
+        
+        btn.MouseButton1Click:Connect(function()
+            print("Teleport para:", name)
+        end)
+    end
+end)
+
+-- Settings
+setBtn.MouseButton1Click:Connect(function()
+    clear()
+    
+    local txt = Instance.new("TextLabel")
+    txt.Text = "Configurações (em breve)"
+    txt.Size = UDim2.new(1,0,0,50)
+    txt.BackgroundTransparency = 1
+    txt.TextColor3 = Color3.fromRGB(255,255,255)
+    txt.Parent = content
+end)
