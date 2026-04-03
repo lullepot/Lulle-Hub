@@ -1,165 +1,165 @@
--- Lulle Hub UI
-local player = game.Players.LocalPlayer
+--// LULLE HUB SUPREMO LIMPO
 
--- Criar GUI
-local gui = Instance.new("ScreenGui")
-gui.Name = "LulleHub"
-gui.Parent = game.CoreGui
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
 
--- Frame principal
-local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 500, 0, 300)
-main.Position = UDim2.new(0.5, -250, 0.5, -150)
-main.BackgroundColor3 = Color3.fromRGB(13, 13, 13)
-main.Parent = gui
+--================ USERS =================
+local OWNER = "lulle"
 
--- Borda roxa
-local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.fromRGB(106, 13, 173)
-stroke.Thickness = 2
-stroke.Parent = main
+local users = {
+    ["lulle"] = {password = "paulomec225@"}
+}
 
--- Título
-local title = Instance.new("TextLabel")
-title.Text = "Lulle Hub"
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(200, 100, 255)
-title.Parent = main
+--================ KEY DATABASE =================
+local keys = {
+    ["FREE-123"] = {expire = os.time() + 3600, type = "temp"},
+    ["VIP-FOREVER"] = {expire = math.huge, type = "permanent"}
+}
 
--- Botão fechar
-local close = Instance.new("TextButton")
-close.Text = "X"
-close.Size = UDim2.new(0, 40, 0, 40)
-close.Position = UDim2.new(1, -40, 0, 0)
-close.BackgroundColor3 = Color3.fromRGB(106, 13, 173)
-close.Parent = main
+local currentUser = nil
 
-close.MouseButton1Click:Connect(function()
-    gui:Destroy()
-end)
-
--- Menu lateral
-local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0, 120, 1, -40)
-menu.Position = UDim2.new(0, 0, 0, 40)
-menu.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-menu.Parent = main
-
--- Área de conteúdo
-local content = Instance.new("Frame")
-content.Size = UDim2.new(1, -120, 1, -40)
-content.Position = UDim2.new(0, 120, 0, 40)
-content.BackgroundTransparency = 1
-content.Parent = main
-
--- Função criar botão
-local function createButton(name, posY)
-    local btn = Instance.new("TextButton")
-    btn.Text = name
-    btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.Position = UDim2.new(0, 0, 0, posY)
-    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    btn.Parent = menu
-    
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(106, 13, 173)
-    end)
-    
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    end)
-    
-    return btn
-end
-
--- Criar abas
-local homeBtn = createButton("Home", 0)
-local farmBtn = createButton("Farm", 40)
-local tpBtn = createButton("Teleport", 80)
-local setBtn = createButton("Settings", 120)
-
--- Função limpar tela
-local function clear()
-    for _, v in pairs(content:GetChildren()) do
-        v:Destroy()
+local function isValidKey(k)
+    local key = keys[k]
+    if key and os.time() < key.expire then
+        return true
     end
+    return false
 end
 
--- Home
-homeBtn.MouseButton1Click:Connect(function()
-    clear()
-    
-    local txt = Instance.new("TextLabel")
-    txt.Text = "Bem-vindo ao Lulle Hub!"
-    txt.Size = UDim2.new(1, 0, 0, 50)
-    txt.BackgroundTransparency = 1
-    txt.TextColor3 = Color3.fromRGB(255,255,255)
-    txt.Parent = content
-end)
+--================ GUI =================
+local gui = Instance.new("ScreenGui", game.CoreGui)
 
--- Farm (SAFE base)
-farmBtn.MouseButton1Click:Connect(function()
-    clear()
-    
-    local start = Instance.new("TextButton")
-    start.Text = "Start Action"
-    start.Size = UDim2.new(0,150,0,40)
-    start.Position = UDim2.new(0,20,0,20)
-    start.Parent = content
-    
-    local stop = Instance.new("TextButton")
-    stop.Text = "Stop Action"
-    stop.Size = UDim2.new(0,150,0,40)
-    stop.Position = UDim2.new(0,20,0,70)
-    stop.Parent = content
-    
-    local running = false
-    
-    start.MouseButton1Click:Connect(function()
-        running = true
-        print("Sistema iniciado (base)")
-        
-        while running do
-            task.wait(1)
-            print("Executando ação...")
-        end
-    end)
-    
-    stop.MouseButton1Click:Connect(function()
-        running = false
-        print("Parado")
-    end)
-end)
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,520,0,330)
+main.Position = UDim2.new(0.5,-260,0.5,-165)
+main.BackgroundColor3 = Color3.fromRGB(20,20,25)
+Instance.new("UICorner", main)
 
--- Teleport (visual)
-tpBtn.MouseButton1Click:Connect(function()
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1,0,1,0)
+content.BackgroundTransparency = 1
+
+local function clear()
+    for _,v in pairs(content:GetChildren()) do v:Destroy() end
+end
+
+--================ HUB =================
+local function loadHub()
     clear()
-    
-    local places = {"Grassland", "Jungle", "Volcano", "Ocean"}
-    
-    for i, name in pairs(places) do
-        local btn = Instance.new("TextButton")
-        btn.Text = name
-        btn.Size = UDim2.new(0,150,0,40)
-        btn.Position = UDim2.new(0,20,0,(i-1)*50)
-        btn.Parent = content
-        
+
+    local title = Instance.new("TextLabel", content)
+    title.Text = "Lulle Hub Ativo 🔥"
+    title.Size = UDim2.new(1,0,0,50)
+    title.TextColor3 = Color3.new(1,1,1)
+    title.BackgroundTransparency = 1
+
+    -- OWNER PANEL
+    if currentUser == OWNER then
+        local btn = Instance.new("TextButton", content)
+        btn.Text = "PAINEL OWNER"
+        btn.Size = UDim2.new(0,200,0,40)
+        btn.Position = UDim2.new(0,20,0,60)
+
         btn.MouseButton1Click:Connect(function()
-            print("Teleport para:", name)
+            clear()
+
+            local info = Instance.new("TextLabel", content)
+            info.Text = "Gerador de Keys"
+            info.Size = UDim2.new(1,0,0,40)
+            info.TextColor3 = Color3.new(1,1,1)
+            info.BackgroundTransparency = 1
+
+            local input = Instance.new("TextBox", content)
+            input.PlaceholderText = "Nome da key"
+            input.Size = UDim2.new(0,200,0,40)
+            input.Position = UDim2.new(0,20,0,50)
+
+            local timeBox = Instance.new("TextBox", content)
+            timeBox.PlaceholderText = "Tempo em segundos"
+            timeBox.Size = UDim2.new(0,200,0,40)
+            timeBox.Position = UDim2.new(0,20,0,100)
+
+            local create = Instance.new("TextButton", content)
+            create.Text = "CRIAR KEY"
+            create.Size = UDim2.new(0,200,0,40)
+            create.Position = UDim2.new(0,20,0,150)
+
+            create.MouseButton1Click:Connect(function()
+                local name = input.Text
+                local time = tonumber(timeBox.Text)
+
+                if name ~= "" and time then
+                    keys[name] = {
+                        expire = os.time() + time,
+                        type = "custom"
+                    }
+                    info.Text = "Key criada: "..name
+                end
+            end)
         end)
     end
-end)
+end
 
--- Settings
-setBtn.MouseButton1Click:Connect(function()
+--================ KEY =================
+local function keyScreen()
     clear()
-    
-    local txt = Instance.new("TextLabel")
-    txt.Text = "Configurações (em breve)"
-    txt.Size = UDim2.new(1,0,0,50)
-    txt.BackgroundTransparency = 1
-    txt.TextColor3 = Color3.fromRGB(255,255,255)
-    txt.Parent = content
-end)
+
+    local box = Instance.new("TextBox", content)
+    box.PlaceholderText = "Digite a key"
+    box.Size = UDim2.new(0,200,0,40)
+    box.Position = UDim2.new(0.5,-100,0.4,0)
+
+    local btn = Instance.new("TextButton", content)
+    btn.Text = "VALIDAR"
+    btn.Size = UDim2.new(0,200,0,40)
+    btn.Position = UDim2.new(0.5,-100,0.55,0)
+
+    local status = Instance.new("TextLabel", content)
+    status.Size = UDim2.new(1,0,0,40)
+    status.Position = UDim2.new(0,0,0.7,0)
+    status.BackgroundTransparency = 1
+    status.TextColor3 = Color3.new(1,1,1)
+
+    btn.MouseButton1Click:Connect(function()
+        if isValidKey(box.Text) then
+            loadHub()
+        else
+            status.Text = "Key inválida ❌"
+        end
+    end)
+end
+
+--================ LOGIN =================
+local function login()
+    clear()
+
+    local user = Instance.new("TextBox", content)
+    user.PlaceholderText = "User"
+    user.Size = UDim2.new(0,200,0,40)
+    user.Position = UDim2.new(0.5,-100,0.3,0)
+
+    local pass = Instance.new("TextBox", content)
+    pass.PlaceholderText = "Pass"
+    pass.Size = UDim2.new(0,200,0,40)
+    pass.Position = UDim2.new(0.5,-100,0.45,0)
+
+    local btn = Instance.new("TextButton", content)
+    btn.Text = "LOGIN"
+    btn.Size = UDim2.new(0,200,0,40)
+    btn.Position = UDim2.new(0.5,-100,0.6,0)
+
+    btn.MouseButton1Click:Connect(function()
+        if users[user.Text] and users[user.Text].password == pass.Text then
+            currentUser = user.Text
+
+            if user.Text == OWNER then
+                loadHub()
+            else
+                keyScreen()
+            end
+        end
+    end)
+end
+
+login()
